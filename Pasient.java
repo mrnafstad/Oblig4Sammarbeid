@@ -32,4 +32,16 @@ class Pasient {
 	public int hentID() {
 		return id;
 	}
+
+	public String hentFødselsnummer() {
+		return this.fødselsNummer;
+	}
+
+	@Override
+	public String toString() {
+		String str = "Pasientens navn: " + this.navn + " \n"
+					+ "PasientID: " + this.id + "\n"
+					+ "Antall resepter: " + this.reseptListe.stoerrelse() + "\n";
+		return str;
+	}
 }

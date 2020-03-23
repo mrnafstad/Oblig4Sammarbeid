@@ -21,6 +21,9 @@ public abstract class Legemiddel {
 	public String hentNavn() {
 		return this.navn;
 	}
+	public int hentID() {
+		return this.id;
+	}
 
 	public double hentPris() {
 		return this.pris;
