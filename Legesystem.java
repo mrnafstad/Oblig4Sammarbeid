@@ -10,19 +10,12 @@ class Legesystem {
 	static SortertLenkeliste<Lege> leger = new SortertLenkeliste<Lege>();
 	static Lenkeliste<Legemiddel> legemidler = new Lenkeliste<Legemiddel>();
 	static Lenkeliste<Resept> resepter = new Lenkeliste<Resept>();
-	static Lenkeliste<Lenkeliste> komplett = new Lenkeliste<Lenkeliste>();
 
 	public static void main(String[] arg) {
 
-		lesFraFil("litenFil.txt");
-		
-		// System.out.println("\n");
-		// for (Lege lege : leger) {
-		// 	System.out.println(lege.toString());
-		// 	for (Resept res : lege.hentResepter()) {
-		// 		System.out.println(res.toString());
-		// 	}
-		// }
+		lesFraFil("storfil.txt");
+		//lesFraFil("litenFil.txt");
+
 
 		meny();
 
@@ -415,17 +408,20 @@ class Legesystem {
 
 			String type = mellom1[1];
 			String navn = mellom1[0];
-			double pris = Double.parseDouble(mellom1[2]);
-			double virkestroff = Double.parseDouble(mellom1[3]);
+			try {
+				double pris = Double.parseDouble(mellom1[2]);
+				double virkestroff = Double.parseDouble(mellom1[3]);
 
-			if (type.compareTo("vanlig") == 0) {
-				legemidler.leggTil(new Vanlig(navn, pris, virkestroff));
-			} else if (type.compareTo("vanedannende") == 0) {
-				int styrke = Integer.parseInt(mellom1[4].trim());
-				legemidler.leggTil(new Vanedannende(navn, pris, virkestroff, styrke));
-			} else if (type.compareTo("narkotisk") == 0) {
-				int styrke = Integer.parseInt(mellom1[4].trim());
-				legemidler.leggTil(new Narkotisk(navn, pris, virkestroff, styrke));
+				if (type.compareTo("vanlig") == 0) {
+					legemidler.leggTil(new Vanlig(navn, pris, virkestroff));
+				} else if (type.compareTo("vanedannende") == 0) {
+					int styrke = Integer.parseInt(mellom1[4].trim());
+					legemidler.leggTil(new Vanedannende(navn, pris, virkestroff, styrke));
+				} else if (type.compareTo("narkotisk") == 0) {
+					int styrke = Integer.parseInt(mellom1[4].trim());
+					legemidler.leggTil(new Narkotisk(navn, pris, virkestroff, styrke));
+				}
+			} catch(NumberFormatException e) {
 			}
 			
 		}
@@ -437,49 +433,65 @@ class Legesystem {
 
 			int legemiddelID = Integer.parseInt(mellom1[0].trim());
 			int pasientID = Integer.parseInt(mellom1[2].trim());
-			int reit = 0;
-
-			String legeNavn = mellom1[1];
-			String reseptType = mellom1[3];
-
-
-			if (mellom1.length == 5) {
-				reit = Integer.parseInt(mellom1[4].trim());
+			boolean pasISystem = false;
+			for (Pasient pas : pasienter) {
+				if (pasientID == pas.hentID()) {
+					pasISystem = true;
+				} 
 			}
-			for (Lege lege : leger) {
-				if (legeNavn.compareTo(lege.hentNavn()) == 0) {
-					if (reseptType.compareTo("hvit") == 0) {
-						try {
-							lege.skrivHvitResept(legemidler.hent(legemiddelID), pasienter.hent(pasientID), reit);
-						} catch(UlovligUtskrift e) {
-							System.out.println("Vanlig lege kan ikke skrive ut narkotiske legemidler");
+
+			boolean middelISystem = false;
+			for (Legemiddel lMiddel : legemidler) {
+				if (legemiddelID == lMiddel.hentID() ) {
+					middelISystem = true;
+				} 
+			}
+
+
+			if (pasISystem && middelISystem) {
+				int reit = 0;
+
+				String legeNavn = mellom1[1];
+				String reseptType = mellom1[3];
+
+
+				for (Lege lege : leger) {
+					if (legeNavn.compareTo(lege.hentNavn()) == 0) {
+						if (reseptType.compareTo("hvit") == 0) {
+							try {
+								reit = Integer.parseInt(mellom1[4].trim());
+								lege.skrivHvitResept(legemidler.hent(legemiddelID), pasienter.hent(pasientID), reit);
+							} catch(UlovligUtskrift e) {
+								System.out.println("Vanlig lege kan ikke skrive ut narkotiske legemidler");
+							}
+						} else if (reseptType.compareTo("blaa") == 0) {
+							try {
+								reit = Integer.parseInt(mellom1[4].trim());
+								lege.skrivBlaaResept(legemidler.hent(legemiddelID), pasienter.hent(pasientID), reit);
+							} catch(UlovligUtskrift e) {
+								System.out.println("Vanlig lege kan ikke skrive ut narkotiske legemidler");
+							}
+						} else if (reseptType.compareTo("millitaer") == 0) {
+							try {
+								reit = Integer.parseInt(mellom1[4].trim());
+								lege.skrivMillitaerResept(legemidler.hent(legemiddelID), pasienter.hent(pasientID), reit);
+							} catch(UlovligUtskrift e) {
+								System.out.println("Vanlig lege kan ikke skrive ut narkotiske legemidler");
+							}
+						} else if (reseptType.compareTo("p") == 0) {
+							try {
+								lege.skrivPResept(legemidler.hent(legemiddelID), pasienter.hent(pasientID));
+							} catch(UlovligUtskrift e) {
+								System.out.println("Vanlig lege kan ikke skrive ut narkotiske legemidler");
+							}
 						}
-					} else if (reseptType.compareTo("blaa") == 0) {
 						try {
-							lege.skrivBlaaResept(legemidler.hent(legemiddelID), pasienter.hent(pasientID), reit);
-						} catch(UlovligUtskrift e) {
-							System.out.println("Vanlig lege kan ikke skrive ut narkotiske legemidler");
-						}
-					} else if (reseptType.compareTo("millitaer") == 0) {
-						try {
-							lege.skrivMillitaerResept(legemidler.hent(legemiddelID), pasienter.hent(pasientID), reit);
-						} catch(UlovligUtskrift e) {
-							System.out.println("Vanlig lege kan ikke skrive ut narkotiske legemidler");
-						}
-					} else if (reseptType.compareTo("p") == 0) {
-						try {
-							lege.skrivPResept(legemidler.hent(legemiddelID), pasienter.hent(pasientID));
-						} catch(UlovligUtskrift e) {
-							System.out.println("Vanlig lege kan ikke skrive ut narkotiske legemidler");
+							resepter.leggTil(lege.hentResepter().hent(lege.hentResepter().stoerrelse() -1));
+						} catch(UgyldigListeIndeks e) {
 						}
 					}
-					resepter.leggTil(lege.hentResepter().hent(lege.hentResepter().stoerrelse() -1));
-					
 				}
-				
 			}
-
-			
 		}		
 	}
 
