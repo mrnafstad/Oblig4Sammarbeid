@@ -4,6 +4,7 @@ import java.io.FileWriter;
 import java.util.Scanner;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.InputMismatchException;
 
 class Legesystem {
 	static Lenkeliste<Pasient> pasienter = new Lenkeliste<Pasient>();
@@ -30,36 +31,46 @@ class Legesystem {
 		while (!quit) {
 
 			System.out.println("\n Gjør ett valg (6 for hovedmeny)");
-			int action = scanner.nextInt();
-			scanner.nextLine();
-
-			switch(action) {
-			case 0:
-				System.out.println("Du valgte å avslutte");
-				quit = true;
-				break;
-			case 1: 
-				skrivOversikt();
-				break;
-			case 2:
-				System.out.println("Vil du legge til: \n");
-				System.out.println(" 1: Lege \n 2: Pasient \n 3: Legemiddel \n 4: Resept \n");
-				int valg = scanner.nextInt();
+			try {
+				int action = scanner.nextInt();
 				scanner.nextLine();
-				leggTilObjekt(valg, scanner);
-				break;
-			case 3:
-				brukResept(scanner);
-				break;
-			case 4: 
-				visStatistikk(scanner);
-				break;
-			case 5:
-				skrivTilFil(scanner);
-			case 6:
-				skrivMeny();
-				break;
+				switch(action) {
+					case 0:
+						System.out.println("Du valgte å avslutte");
+						quit = true;
+						break;
+					case 1: 
+						skrivOversikt();
+						break;
+					case 2:
+						System.out.println("Vil du legge til: \n");
+						System.out.println(" 1: Lege \n 2: Pasient \n 3: Legemiddel \n 4: Resept \n");
+						try {
+							int valg = scanner.nextInt();
+							scanner.nextLine();
+							leggTilObjekt(valg, scanner);
+						} catch(InputMismatchException e) {
+							System.out.println("Du må oppgi et heltall (1, 2, 3 eller 4): \n");
+							meny();
+						}
+						break;
+					case 3:
+						brukResept(scanner);
+						break;
+					case 4: 
+						visStatistikk(scanner);
+						break;
+					case 5:
+						skrivTilFil(scanner);
+					case 6:
+						skrivMeny();
+						break;
+				}
+			} catch(InputMismatchException e) {
+				System.out.println("Du må oppgi et heltall (0, 1, 2, 3, 4, 5, 6): \n");
+				meny();
 			}
+
 		}
 	}
 
@@ -216,12 +227,16 @@ class Legesystem {
 		System.out.println("Hvilken statistikk vil du se? \n"
 							+ "(1) Totalt antall utskrevne resepter på vanedannende legemidler \n"
 							+ "(2) Totalt antall utskrevne resepter på narkotiske legemidler \n"
-							+ "(3) Mulig misbruk av narkotika \n");
+							+ "(3) Mulig misbruk av narkotika \n"
+							+ "(0) Hovedmeny");
 		int valg = scanner.nextInt();
 		scanner.nextLine();
 		int count;
 
 		switch (valg) {
+			case 0:
+				meny();
+				break;
 			case 1:
 				count = 0;
 				for (Resept res : resepter) {
