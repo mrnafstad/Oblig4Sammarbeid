@@ -29,7 +29,7 @@ class Legesystem {
 
 		while (!quit) {
 
-			System.out.println("\n Gjør ett valg (5 for hovedmeny)");
+			System.out.println("\n Gjør ett valg (6 for hovedmeny)");
 			int action = scanner.nextInt();
 			scanner.nextLine();
 
@@ -454,13 +454,15 @@ class Legesystem {
 				String legeNavn = mellom1[1];
 				String reseptType = mellom1[3];
 
-
+				// Holdes false om vanlig lege prøver å skrive ut resept på narkotisk
+				boolean lagTil = false;
 				for (Lege lege : leger) {
 					if (legeNavn.compareTo(lege.hentNavn()) == 0) {
 						if (reseptType.compareTo("hvit") == 0) {
 							try {
 								reit = Integer.parseInt(mellom1[4].trim());
 								lege.skrivHvitResept(legemidler.hent(legemiddelID), pasienter.hent(pasientID), reit);
+								lagTil = true;
 							} catch(UlovligUtskrift e) {
 								System.out.println("Vanlig lege kan ikke skrive ut narkotiske legemidler");
 							}
@@ -468,6 +470,7 @@ class Legesystem {
 							try {
 								reit = Integer.parseInt(mellom1[4].trim());
 								lege.skrivBlaaResept(legemidler.hent(legemiddelID), pasienter.hent(pasientID), reit);
+								lagTil = true;
 							} catch(UlovligUtskrift e) {
 								System.out.println("Vanlig lege kan ikke skrive ut narkotiske legemidler");
 							}
@@ -475,19 +478,20 @@ class Legesystem {
 							try {
 								reit = Integer.parseInt(mellom1[4].trim());
 								lege.skrivMillitaerResept(legemidler.hent(legemiddelID), pasienter.hent(pasientID), reit);
+								lagTil = true;
 							} catch(UlovligUtskrift e) {
 								System.out.println("Vanlig lege kan ikke skrive ut narkotiske legemidler");
 							}
 						} else if (reseptType.compareTo("p") == 0) {
 							try {
 								lege.skrivPResept(legemidler.hent(legemiddelID), pasienter.hent(pasientID));
+								lagTil = true;
 							} catch(UlovligUtskrift e) {
 								System.out.println("Vanlig lege kan ikke skrive ut narkotiske legemidler");
 							}
 						}
-						try {
+						if (lagTil) {
 							resepter.leggTil(lege.hentResepter().hent(lege.hentResepter().stoerrelse() -1));
-						} catch(UgyldigListeIndeks e) {
 						}
 					}
 				}
